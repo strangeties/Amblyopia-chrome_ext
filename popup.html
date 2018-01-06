@@ -1,0 +1,44 @@
+
+<!doctype html>
+<html>
+  <head>
+    <title>Amblyopia Training</title>
+    <style type="text/css">
+      body {
+        margin: 10px;
+        white-space: nowrap;
+      }
+
+      h1 {
+        font-size: 15px;
+      }
+
+      #container {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+      }
+    </style>
+    <script src="popup.js"></script>
+  </head>
+
+  <body>
+    <h1>Amblyopia Training Settings</h1>
+    <div id="container">
+      <span>Choose a color</span>
+      <select id="dropdown">
+        <option selected disabled hidden value=''></option>
+        <option value="white">White</option>
+        <option value="pink">Pink</option>
+        <option value="green">Green</option>
+        <option value="yellow">Yellow</option>
+        <option value="#191919">Black</option>
+      </select>
+    </div>
+    &nbsp;
+    <div>
+        <button type="button" id="incr_font_size">Increase Font Size</button>
+        <button type="button" id="decr_font_size">Decrease Font Size</button>
+    </div>
+  </body>
+</html>

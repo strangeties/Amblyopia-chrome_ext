@@ -1,0 +1,16 @@
+{
+  "manifest_version": 2,
+
+  "name": "Amblyopia-Training Font Style Adjuster",
+  "description": "This extension allows the user to change the background color of the current page, text color, and text size to facilitate amblyopia training.",
+  "version": "1.0",
+
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "activeTab",
+    "storage"
+  ]
+}
