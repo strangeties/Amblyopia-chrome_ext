@@ -2,7 +2,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>Amblyopia Training</title>
+    <title>Amblyopia Training Settings</title>
     <style type="text/css">
       body {
         margin: 10px;
@@ -24,21 +24,35 @@
 
   <body>
     <h1>Amblyopia Training Settings</h1>
-    <div id="container">
-      <span>Choose a color</span>
-      <select id="dropdown">
-        <option selected disabled hidden value=''></option>
-        <option value="white">White</option>
-        <option value="pink">Pink</option>
-        <option value="green">Green</option>
-        <option value="yellow">Yellow</option>
-        <option value="#191919">Black</option>
-      </select>
+    <div align="right">
+        <button type="button" id="update_page">Update page</button>
     </div>
-    &nbsp;
-    <div>
-        <button type="button" id="incr_font_size">Increase Font Size</button>
-        <button type="button" id="decr_font_size">Decrease Font Size</button>
-    </div>
+    <br>
+    <table width="100%">
+        <tr>
+            <td style="border: 1px solid grey">
+                <br>
+                <div style="font-size: large; text-align: center; line-height: 150%; color: red; background-color: #191919; padding: 4px" id="left_eye_test">TEST</div>
+                &nbsp;
+                <div style="padding: 4px" align="center">visible only to left eye</div>
+            </td>
+            <td style="border: 1px solid grey">
+                <br>
+                <div style="font-size: large; text-align: center; line-height: 150%; color: blue; background-color: #191919; padding: 4px" id="right_eye_test">TEST</div>
+                &nbsp;
+                <div style="padding: 4px" align="center">visible only to right eye</div>
+            </td>
+        </tr>
+    </table>
+    <hr>
+    <table><tr>
+        <td><button type="button" id="decr_font_size">-</button></td>
+        <td>Font size</td>
+        <td><button type="button" id="incr_font_size">+</button></td>
+    </tr></table>
+    <hr>
+    <table><tr><td>
+    <button type="button" id="save_settings">Save settings for all URL's with domain, "<div id="domain" style="display: inline-block;">n/a</div>"</button>
+    </td></tr></table>
   </body>
 </html>

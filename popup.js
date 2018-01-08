@@ -54,6 +54,7 @@ function getCurrentTabUrl(callback) {
  */
 function changeBackgroundColor(color) {
   var script = `color = "` + color + `";
+console.log("Changing background color...");
 document.body.style.backgroundColor=color;
 var els = document.getElementsByTagName("p");
 for (var el of els) {
@@ -69,32 +70,41 @@ for (var el of els) {
   });
 }
 
-function addToFontSize(val) {
+function setFontSize(val) {
     var script = `val = ` + val + `;
+console.log("Setting font size to " + val + "...");
+var els = document.getElementsByTagName('p');
 for (var el of els) {
-    var old_size = window.getComputedStyle(el, null).getPropertyValue('font-size').replace('px','');
-    var new_size = parseFloat(old_size) + val;
-    if (new_size > 0) {
-        el.style.fontSize = new_size + 'px';
+        el.style.fontSize = val + "px";
         el.style.lineHeight = '100%';
-    }
 }`;
     chrome.tabs.executeScript({
         code: script
     });
 }
 
-function increaseFontSize() {
-    addToFontSize(4);
+function setFontSizeInExt(size) {
+    var right_eye_test = document.getElementById('right_eye_test');
+    right_eye_test.style.fontSize = size + "px";
+    var left_eye_test = document.getElementById('left_eye_test');
+    left_eye_test.style.fontSize = size + "px";
 }
 
-function decreaseFontSize() {
-    addToFontSize(-4);
+function increaseFontSizeInExt(settings) {
+    settings.font_size += 4;
+    setFontSizeInExt(settings.font_size);
+}
+
+function decreaseFontSizeInExt(settings) {
+    if (settings.font_size >= 8) {
+        settings.font_size -= 4;
+        setFontSizeInExt(settings.font_size);
+    }
 }
 
 function changeFontColor(colors_str) {
     var script = `var colors_str = "` + colors_str + `";
-console.log("Updating Font Colors...");
+console.log("Changing font color...");
 var colors = colors_str.split('|');
 var els = document.getElementsByTagName('p');
 for (var el of els) {
@@ -134,35 +144,34 @@ for (var el of els) {
     });
 }
 
-/**
- * Gets the saved background color for url.
- *
- * @param {string} url URL whose background color is to be retrieved.
- * @param {function(string)} callback called with the saved background color for
- *     the given url on success, or a falsy value if no color is retrieved.
- */
-function getSavedBackgroundColor(url, callback) {
-  // See https://developer.chrome.com/apps/storage#type-StorageArea. We check
-  // for chrome.runtime.lastError to ensure correctness even when the API call
-  // fails.
-  chrome.storage.sync.get(url, (items) => {
-    callback(chrome.runtime.lastError ? null : items[url]);
-  });
+function settingsToString(settings) {
+    return settings.colors_on + "|" + settings.font_size;
 }
 
-/**
- * Sets the given background color for url.
- *
- * @param {string} url URL for which background color is to be saved.
- * @param {string} color The background color to be saved.
- */
-function saveBackgroundColor(url, color) {
-  var items = {};
-  items[url] = color;
-  // See https://developer.chrome.com/apps/storage#type-StorageArea. We omit the
-  // optional callback since we don't need to perform any action once the
-  // background color is saved.
-  chrome.storage.sync.set(items);
+function stringToSettings(str) {
+    var settings = {};
+    var arr = str.split('|');
+    settings.colors_on = arr[0] == 'true';
+    settings.font_size = parseInt(arr[1]);
+    return settings;
+}
+
+// Gets the saved settings for a given domain.
+function getSavedOrDefaultSettings(hostname, callback) {
+    chrome.storage.sync.get(hostname, (items) => {
+        var default_settings = {
+            font_size: 20,
+            colors_on: false
+        }
+        callback(chrome.runtime.lastError ? default_settings : (items[hostname] === undefined ? default_settings : stringToSettings(items[hostname])));
+    });
+}
+
+// Saves the settings for a given domain.
+function saveSettings(hostname, settings) {
+    var items = {};
+    items[hostname] = settingsToString(settings);
+    chrome.storage.sync.set(items);
 }
 
 // This extension loads the saved background color for the current tab if one
@@ -174,43 +183,51 @@ function saveBackgroundColor(url, color) {
 // chrome.storage.local allows the extension data to be synced across multiple
 // user devices.
 document.addEventListener('DOMContentLoaded', () => {
-  var updated_font_colors = false;
+
+  var settings = {
+      font_size: 20,
+      colors_on: false
+  };
     
   getCurrentTabUrl((url) => {
-    var dropdown = document.getElementById('dropdown');
-
-    // Load the saved background color for this page and modify the dropdown
-    // value, if needed.
-    getSavedBackgroundColor(url, (savedColor) => {
-      if (savedColor) {
-        changeBackgroundColor(savedColor);
-        if (!updated_font_colors) {
+    var parser = document.createElement('a');
+    parser.href = url;
+    var hostname = parser.hostname;
+    document.getElementById("domain").innerHTML = hostname;
+      
+    // Load the saved settings for this host.
+    getSavedOrDefaultSettings(hostname, (savedSettings) => {
+        settings.colors_on = savedSettings.colors_on;
+        settings.font_size = savedSettings.font_size;
+        setFontSize(savedSettings.font_size);
+        setFontSizeInExt(savedSettings.font_size);
+        if (savedSettings.colors_on) {
+            changeBackgroundColor('#191919');
             changeFontColor('#7D0000|#00007D');
-            updated_font_colors = true;
         }
-        dropdown.value = savedColor;
-      }
-    });
-
-    // Ensure the background color is changed and saved when the dropdown
-    // selection changes.
-    dropdown.addEventListener('change', () => {
-      changeBackgroundColor(dropdown.value);
-      if (!updated_font_colors) {
-          changeFontColor('#7D0000|#00007D');
-          updated_font_colors = true;
-      }
-      saveBackgroundColor(url, dropdown.value);
     });
       
     var incr_font_size = document.getElementById('incr_font_size');
     incr_font_size.addEventListener('click', () => {
-        increaseFontSize();
+        increaseFontSizeInExt(settings);
     });
       
     var decr_font_size = document.getElementById('decr_font_size');
     decr_font_size.addEventListener('click', () => {
-        decreaseFontSize();
-    }); 
+        decreaseFontSizeInExt(settings);
+    });
+      
+    var update_page = document.getElementById('update_page');
+    update_page.addEventListener('click', () => {
+        setFontSize(settings.font_size);
+        changeBackgroundColor('#191919');
+        changeFontColor('#7D0000|#00007D');
+        settings.colors_on = true;
+    });
+      
+    var save_settings = document.getElementById('save_settings');
+    save_settings.addEventListener('click', () => {
+       saveSettings(hostname, settings); 
+    });
   });
 });
