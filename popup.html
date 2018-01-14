@@ -28,17 +28,17 @@
         <button type="button" id="update_page">Update page</button>
     </div>
     <br>
-    <table width="100%">
-        <tr>
+    <table width="720">
+        <tr height="260">
             <td style="border: 1px solid grey">
                 <br>
-                <div style="font-size: large; text-align: center; line-height: 150%; color: red; background-color: #191919; padding: 4px" id="left_eye_test">TEST</div>
+                <div style="font-size: large; text-align: center; line-height: 150%; color: red; background-color: rgb(25,25,25); padding: 4px" id="left_eye_test">TEST</div>
                 &nbsp;
                 <div style="padding: 4px" align="center">visible only to left eye</div>
             </td>
             <td style="border: 1px solid grey">
                 <br>
-                <div style="font-size: large; text-align: center; line-height: 150%; color: blue; background-color: #191919; padding: 4px" id="right_eye_test">TEST</div>
+                <div style="font-size: large; text-align: center; line-height: 150%; color: blue; background-color: rgb(25,25,25); padding: 4px" id="right_eye_test">TEST</div>
                 &nbsp;
                 <div style="padding: 4px" align="center">visible only to right eye</div>
             </td>
@@ -46,10 +46,49 @@
     </table>
     <hr>
     <table><tr>
-        <td><button type="button" id="decr_font_size">-</button></td>
-        <td>Font size</td>
-        <td><button type="button" id="incr_font_size">+</button></td>
+        <td>
+            Font size:
+            <div style="display: inline" id="selected_font_size">20</div>
+        </td>
+        <td>
+            <input type="range" min="8" max="120" value="20" class="slider" id="font_size_slider">
+        </td>
     </tr></table>
+    <hr>
+    <table>
+        <tr>
+            <td colspan="2">
+                Background color:
+            </td>
+        </tr>
+        <tr>
+            <td>
+                R:
+                <div style="display: inline" id="selected_bg_r">25</div>
+            </td>
+            <td>
+                <input type="range" min="0" max="255" value="25" class="slider" id="bg_r_slider">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                G:
+                <div style="display: inline" id="selected_bg_g">25</div>
+            </td>
+            <td>
+                <input type="range" min="0" max="255" value="25" class="slider" id="bg_g_slider">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                B:
+                <div style="display: inline" id="selected_bg_b">25</div>
+            </td>
+            <td>
+                <input type="range" min="0" max="255" value="25" class="slider" id="bg_b_slider">
+            </td>
+        </tr>
+    </table>
     <hr>
     <table><tr><td>
     <button type="button" id="save_settings">Save settings for all URL's with domain, "<div id="domain" style="display: inline-block;">n/a</div>"</button>
