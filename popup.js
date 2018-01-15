@@ -55,7 +55,7 @@ function getCurrentTabUrl(callback) {
 function changeBackgroundColor(r, g, b) {
     color = "rgb(" + r + "," + g + "," + b + ")";
   var script = `color = "` + color + `";
-console.log("Changing background color...");
+console.log("Changing background color to" + color + "...");
 document.body.style.backgroundColor=color;
 var els = document.getElementsByTagName("p");
 for (var el of els) {
@@ -77,33 +77,9 @@ function setBgColorInExt(r, g, b) {
     document.getElementById("right_eye_test").style.backgroundColor = color;
 }
 
-function setFontSize(val) {
-    var script = `val = ` + val + `;
-console.log("Setting font size to " + val + "...");
-var els = document.getElementsByTagName('p');
-for (var el of els) {
-        el.style.fontSize = val + "px";
-        el.style.lineHeight = '100%';
-}`;
-    chrome.tabs.executeScript({
-        code: script
-    });
-}
-
-function setFontSizeInExt(size) {
-    var right_eye_test = document.getElementById('right_eye_test');
-    right_eye_test.style.fontSize = size + "px";
-    var left_eye_test = document.getElementById('left_eye_test');
-    left_eye_test.style.fontSize = size + "px";
-    var script = `console.log("calling setFontSizeInExt");`
-    chrome.tabs.executeScript({
-        code: script
-    });
-}
-
 function changeFontColor(colors_str) {
     var script = `var colors_str = "` + colors_str + `";
-console.log("Changing font color...");
+console.log("Changing font color to " + colors_str + "...");
 var colors = colors_str.split('|');
 var els = document.getElementsByTagName('p');
 for (var el of els) {
@@ -143,12 +119,48 @@ for (var el of els) {
     });
 }
 
+function setLeColorInExt(r, g, b) {
+    color = "rgb(" + r + "," + g + "," + b + ")";
+    document.getElementById("left_eye_test").style.color = color;
+}
+
+function setReColorInExt(r, g, b) {
+    color = "rgb(" + r + "," + g + "," + b + ")";
+    document.getElementById("right_eye_test").style.color = color;
+}
+
+function setFontSize(val) {
+    var script = `val = ` + val + `;
+console.log("Setting font size to " + val + "...");
+var els = document.getElementsByTagName('p');
+for (var el of els) {
+        el.style.fontSize = val + "px";
+        el.style.lineHeight = '100%';
+}`;
+    chrome.tabs.executeScript({
+        code: script
+    });
+}
+
+function setFontSizeInExt(size) {
+    var right_eye_test = document.getElementById('right_eye_test');
+    right_eye_test.style.fontSize = size + "px";
+    var left_eye_test = document.getElementById('left_eye_test');
+    left_eye_test.style.fontSize = size + "px";
+}
+
 function settingsToString(settings) {
     return settings.colors_on + "|" + 
         settings.font_size + "|" + 
         settings.bg_r + "|" + 
         settings.bg_g + "|" + 
-        settings.bg_b;
+        settings.bg_b + "|" + 
+        settings.le_r + "|" +
+        settings.le_g + "|" +
+        settings.le_b + "|" +
+        settings.re_r + "|" +
+        settings.re_g + "|" +
+        settings.re_b;
 }
 
 function stringToSettings(str) {
@@ -159,6 +171,12 @@ function stringToSettings(str) {
     settings.bg_r = parseInt(arr[2]);
     settings.bg_g = parseInt(arr[3]);
     settings.bg_b = parseInt(arr[4]);
+    settings.le_r = parseInt(arr[5]);
+    settings.le_g = parseInt(arr[6]);
+    settings.le_b = parseInt(arr[7]);
+    settings.re_r = parseInt(arr[8]);
+    settings.re_g = parseInt(arr[9]);
+    settings.re_b = parseInt(arr[10]);
     return settings;
 }
 
@@ -170,7 +188,13 @@ function getSavedOrDefaultSettings(hostname, callback) {
             colors_on: false,
             bg_r: 25,
             bg_g: 25,
-            bg_b: 25
+            bg_b: 25,
+            le_r: 255,
+            le_g: 0,
+            le_b: 0,
+            re_r: 0,
+            re_g: 0,
+            re_b: 255
         }
         callback(chrome.runtime.lastError ? default_settings : (items[hostname] === undefined ? default_settings : stringToSettings(items[hostname])));
     });
@@ -193,17 +217,28 @@ function saveSettings(hostname, settings) {
 // user devices.
 document.addEventListener('DOMContentLoaded', () => {
 
-  var settings = {
+    var settings = {
       font_size: 20,
-      colors_on: false
-  };
+      colors_on: false,
+      bg_r: 25,
+      bg_g: 25,
+      bg_b: 25,
+      le_r: 255,
+      le_g: 0,
+      le_b: 0,
+      re_r: 0,
+      re_g: 0,
+      re_b: 255
+    };
     
-  getCurrentTabUrl((url) => {
-    var parser = document.createElement('a');
-    parser.href = url;
-    var hostname = parser.hostname;
-    document.getElementById("domain").innerHTML = hostname;
-      
+    getCurrentTabUrl((url) => {
+        var parser = document.createElement('a');
+        parser.href = url;
+        var hostname = parser.hostname;
+        document.getElementById("domain").innerHTML = hostname;
+    
+    var update_page = document.getElementById('update_page');    
+        
     var font_size_slider = document.getElementById("font_size_slider");
     var selected_font_size = document.getElementById("selected_font_size");
       
@@ -214,40 +249,111 @@ document.addEventListener('DOMContentLoaded', () => {
     var selected_bg_g = document.getElementById("selected_bg_g");  
     var selected_bg_b = document.getElementById("selected_bg_b"); 
       
+    var le_r_slider = document.getElementById("le_r_slider");  
+    var le_g_slider = document.getElementById("le_g_slider");  
+    var le_b_slider = document.getElementById("le_b_slider"); 
+    var selected_le_r = document.getElementById("selected_le_r");  
+    var selected_le_g = document.getElementById("selected_le_g");  
+    var selected_le_b = document.getElementById("selected_le_b"); 
+      
+    var re_r_slider = document.getElementById("re_r_slider");  
+    var re_g_slider = document.getElementById("re_g_slider");  
+    var re_b_slider = document.getElementById("re_b_slider"); 
+    var selected_re_r = document.getElementById("selected_re_r");  
+    var selected_re_g = document.getElementById("selected_re_g");  
+    var selected_re_b = document.getElementById("selected_re_b"); 
+      
     // Load the saved settings for this host.
     getSavedOrDefaultSettings(hostname, (savedSettings) => {
-        settings.colors_on = savedSettings.colors_on;
-        settings.font_size = savedSettings.font_size;
-        settings.bg_r = savedSettings.bg_r;
-        settings.bg_g = savedSettings.bg_g;
-        settings.bg_b = savedSettings.bg_b;
+        update_page.disabled = true;
+        
+        if (!isNaN(savedSettings.colors_on)) {
+            settings.colors_on = savedSettings.colors_on;
+        }
+        if (!isNaN(savedSettings.font_size)) {
+            settings.font_size = savedSettings.font_size;
+        }
+        if (!isNaN(savedSettings.bg_r)) {
+            settings.bg_r = savedSettings.bg_r;
+        }
+        if (!isNaN(savedSettings.bg_g)) {
+            settings.bg_g = savedSettings.bg_g;
+        }
+        if (!isNaN(savedSettings.bg_b)) {
+            settings.bg_b = savedSettings.bg_b;
+        }
+        if (!isNaN(savedSettings.le_r)) {
+            settings.le_r = savedSettings.le_r;
+        }
+        if (!isNaN(savedSettings.le_g)) {
+            settings.le_g = savedSettings.le_g;
+        }
+        if (!isNaN(savedSettings.le_b)) {
+            settings.le_b = savedSettings.le_b;
+        }
+        if (!isNaN(savedSettings.re_r)) {
+            settings.re_r = savedSettings.re_r;
+        }
+        if (!isNaN(savedSettings.re_g)) {
+            settings.re_g = savedSettings.re_g;
+        }
+        if (!isNaN(savedSettings.re_b)) {
+            settings.re_b = savedSettings.re_b;
+        }
+        
         setFontSize(savedSettings.font_size);
         setFontSizeInExt(savedSettings.font_size);
         setBgColorInExt(settings.bg_r, settings.bg_g, settings.bg_b);
+        setLeColorInExt(settings.le_r, settings.le_g, settings.le_b);
+        setReColorInExt(settings.re_r, settings.re_g, settings.re_b);
+        bg_r_slider.value = settings.bg_r;
         selected_bg_r.innerHTML = settings.bg_r;
+        bg_g_slider.value = settings.bg_g;
         selected_bg_g.innerHTML = settings.bg_g;
+        bg_b_slider.value = settings.bg_b;
         selected_bg_b.innerHTML = settings.bg_b;
+        
+        le_r_slider.value = settings.le_r;
+        selected_le_r.innerHTML = settings.le_r;
+        le_g_slider.value = settings.le_g;
+        selected_le_g.innerHTML = settings.le_g;
+        le_b_slider.value = settings.le_b;
+        selected_le_b.innerHTML = settings.le_b;
+        re_r_slider.value = settings.re_r;
+        selected_re_r.innerHTML = settings.re_r;
+        re_g_slider.value = settings.re_g;
+        selected_re_g.innerHTML = settings.re_g;
+        re_b_slider.value = settings.re_b;
+        selected_re_b.innerHTML = settings.re_b;
+        
         font_size_slider.value = savedSettings.font_size;
         selected_font_size.innerHTML = savedSettings.font_size;
         if (savedSettings.colors_on) {
             changeBackgroundColor(settings.bg_r, settings.bg_g, settings.bg_b);
-            changeFontColor('#7D0000|#00007D');
+            var le_color = "rgb(" + settings.le_r + "," + settings.le_g + "," + settings.le_b + ")";
+            var re_color = "rgb(" + settings.re_r + "," + settings.re_g + "," + settings.re_b + ")";
+            changeFontColor(le_color + "|" + re_color);
         }
+        
+        update_page.disabled = false;
     });
-    
+        
     font_size_slider.addEventListener('change', () => {
         settings.font_size = font_size_slider.value;
-        selected_font_size.innerHTML = settings.font_size;
         setFontSizeInExt(settings.font_size);
     });
       
+    font_size_slider.addEventListener('input', () => {
+        selected_font_size.innerHTML = font_size_slider.value;
+    })    
+    
     bg_r_slider.addEventListener('change', () => {
         settings.bg_r = bg_r_slider.value;
         setBgColorInExt(bg_r_slider.value, bg_g_slider.value, bg_b_slider.value);
     });
       
     bg_r_slider.addEventListener('input', () => {
-        selected_bg_r.innerHTML = bg_r_slider.value
+        selected_bg_r.innerHTML = bg_r_slider.value;
     });
       
     bg_g_slider.addEventListener('change', () => {
@@ -257,7 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
       
     bg_g_slider.addEventListener('input', () => {
-        selected_bg_g.innerHTML = bg_g_slider.value
+        selected_bg_g.innerHTML = bg_g_slider.value;
     });
       
     bg_b_slider.addEventListener('change', () => {
@@ -267,20 +373,82 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     bg_b_slider.addEventListener('input', () => {
-        selected_bg_b.innerHTML = bg_b_slider.value
+        selected_bg_b.innerHTML = bg_b_slider.value;
+    });
+   
+    le_r_slider.addEventListener('change', () => {
+        settings.le_r = le_r_slider.value;
+        setLeColorInExt(le_r_slider.value, le_g_slider.value, le_b_slider.value);
+    });
+      
+    le_r_slider.addEventListener('input', () => {
+        selected_le_r.innerHTML = le_r_slider.value;
+    });
+      
+    le_g_slider.addEventListener('change', () => {
+        settings.le_g = le_g_slider.value;
+        selected_le_g.innerHTML = settings.le_g;
+        setLeColorInExt(le_r_slider.value, le_g_slider.value, le_b_slider.value);
+    });
+      
+    le_g_slider.addEventListener('input', () => {
+        selected_le_g.innerHTML = le_g_slider.value;
+    });
+      
+    le_b_slider.addEventListener('change', () => {
+        settings.le_b = le_b_slider.value;
+        selected_le_b.innerHTML = settings.le_b;
+        setLeColorInExt(le_r_slider.value, le_g_slider.value, le_b_slider.value);
+    });
+    
+    le_b_slider.addEventListener('input', () => {
+        selected_le_b.innerHTML = le_b_slider.value;
+    });
+      
+    re_r_slider.addEventListener('change', () => {
+        settings.re_r = re_r_slider.value;
+        setReColorInExt(re_r_slider.value, re_g_slider.value, re_b_slider.value);
+    });
+      
+    re_r_slider.addEventListener('input', () => {
+        selected_re_r.innerHTML = re_r_slider.value;
+    });
+      
+    re_g_slider.addEventListener('change', () => {
+        settings.re_g = re_g_slider.value;
+        selected_re_g.innerHTML = settings.re_g;
+        setReColorInExt(re_r_slider.value, re_g_slider.value, re_b_slider.value);
+    });
+      
+    re_g_slider.addEventListener('input', () => {
+        selected_re_g.innerHTML = re_g_slider.value;
+    });
+      
+    re_b_slider.addEventListener('change', () => {
+        settings.re_b = re_b_slider.value;
+        selected_re_b.innerHTML = settings.re_b;
+        setReColorInExt(re_r_slider.value, re_g_slider.value, re_b_slider.value);
+    });
+    
+    re_b_slider.addEventListener('input', () => {
+        selected_re_b.innerHTML = re_b_slider.value;
     });
       
     var update_page = document.getElementById('update_page');
     update_page.addEventListener('click', () => {
+        update_page.disable = true;
         setFontSize(settings.font_size);
         changeBackgroundColor(settings.bg_r, settings.bg_g, settings.bg_b);
-        changeFontColor('#7D0000|#00007D');
+        var le_color = "rgb(" + settings.le_r + "," + settings.le_g + "," + settings.le_b + ")";
+        var re_color = "rgb(" + settings.re_r + "," + settings.re_g + "," + settings.re_b + ")";
+        changeFontColor(le_color + "|" + re_color);
         settings.colors_on = true;
+        update_page.disable = false;
     });
       
     var save_settings = document.getElementById('save_settings');
     save_settings.addEventListener('click', () => {
        saveSettings(hostname, settings); 
     });
-  });
+});
 });

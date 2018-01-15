@@ -32,13 +32,13 @@
         <tr height="260">
             <td style="border: 1px solid grey">
                 <br>
-                <div style="font-size: large; text-align: center; line-height: 150%; color: red; background-color: rgb(25,25,25); padding: 4px" id="left_eye_test">TEST</div>
+                <div style="font-size: large; text-align: center; line-height: 150%; color: RGB(255,0,0); background-color: rgb(25,25,25); padding: 4px" id="left_eye_test">TEST</div>
                 &nbsp;
                 <div style="padding: 4px" align="center">visible only to left eye</div>
             </td>
             <td style="border: 1px solid grey">
                 <br>
-                <div style="font-size: large; text-align: center; line-height: 150%; color: blue; background-color: rgb(25,25,25); padding: 4px" id="right_eye_test">TEST</div>
+                <div style="font-size: large; text-align: center; line-height: 150%; color: RGB(0,0,255); background-color: rgb(25,25,25); padding: 4px" id="right_eye_test">TEST</div>
                 &nbsp;
                 <div style="padding: 4px" align="center">visible only to right eye</div>
             </td>
@@ -51,7 +51,7 @@
             <div style="display: inline" id="selected_font_size">20</div>
         </td>
         <td>
-            <input type="range" min="8" max="120" value="20" class="slider" id="font_size_slider">
+            <input type="range" min="8" max="120" step="1" value="20" class="slider" id="font_size_slider">
         </td>
     </tr></table>
     <hr>
@@ -67,7 +67,7 @@
                 <div style="display: inline" id="selected_bg_r">25</div>
             </td>
             <td>
-                <input type="range" min="0" max="255" value="25" class="slider" id="bg_r_slider">
+                <input type="range" min="0" max="255" step="1" value="25" class="slider" id="bg_r_slider">
             </td>
         </tr>
         <tr>
@@ -76,7 +76,7 @@
                 <div style="display: inline" id="selected_bg_g">25</div>
             </td>
             <td>
-                <input type="range" min="0" max="255" value="25" class="slider" id="bg_g_slider">
+                <input type="range" min="0" max="255" step="1" value="25" class="slider" id="bg_g_slider">
             </td>
         </tr>
         <tr>
@@ -85,7 +85,66 @@
                 <div style="display: inline" id="selected_bg_b">25</div>
             </td>
             <td>
-                <input type="range" min="0" max="255" value="25" class="slider" id="bg_b_slider">
+                <input type="range" min="0" max="255" step="1" value="25" class="slider" id="bg_b_slider">
+            </td>
+        </tr>
+    </table>
+    <hr>
+    <table width="720">
+        <tr>
+            <td colspan="2">
+                Left eye font color:
+            </td>
+            <td colspan="2">
+                Right eye font color:
+            </td>
+        </tr>
+        <tr>
+            <td>
+                R:
+                <div style="display: inline" id="selected_le_r">0</div>
+            </td>
+            <td>
+                <input type="range" min="0" max="255" step="1" value="0" class="slider" id="le_r_slider">
+            </td>
+            <td>
+                R:
+                <div style="display: inline" id="selected_re_r">255</div>
+            </td>
+            <td>
+                <input type="range" min="0" max="255" step="1" value="255" class="slider" id="re_r_slider">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                G:
+                <div style="display: inline" id="selected_le_g">0</div>
+            </td>
+            <td>
+                <input type="range" min="0" max="255" step="1" value="0" class="slider" id="le_g_slider">
+            </td>
+            <td>
+                G:
+                <div style="display: inline" id="selected_re_g">0</div>
+            </td>
+            <td>
+                <input type="range" min="0" max="255" step="1" value="0" class="slider" id="re_g_slider">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                B:
+                <div style="display: inline" id="selected_le_b">255</div>
+            </td>
+            <td>
+                <input type="range" min="0" max="255" step="1" value="255" class="slider" id="le_b_slider">
+            </td>
+            <td>
+                B:
+                <div style="display: inline" id="selected_re_b">0</div>
+            </td>
+            <td>
+                <input type="range" min="0" max="255" step="1" value="0" class="slider" id="re_b_slider">
             </td>
         </tr>
     </table>
