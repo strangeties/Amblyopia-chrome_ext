@@ -55,10 +55,10 @@ function setBgColorInExt(r, g, b) {
     document.getElementById("right_eye_test").style.backgroundColor = color;
 }
 
-function changeFontColor(colors_str) {
+function changeFontColor(colors_str, first_run) {
     DisableUpdatePage();
     changing_font_color = true;
-    var script = `var colors_str = "` + colors_str + `";
+    var script = first_run ? `var colors_str = "` + colors_str + `";
 console.log("Changing font colors to " + colors_str + "...");
 var colors = colors_str.split('|');
 var els = document.getElementsByTagName('p');
@@ -94,6 +94,21 @@ for (var el of els) {
         }
     }
 }
+console.log("Done changing font colors to " + colors + ".");` 
+    :
+    `var colors_str = "` + colors_str + `";
+console.log("Changing font colors to " + colors_str + "...");
+var colors = colors_str.split('|');
+var els = document.getElementsByTagName('p');
+for (var el of els) {
+    var children = el.children;
+    for (var i = 0; i < children.length; i++) {
+        var chil = children[i];
+        if (chil.tagName.toLowerCase() == "span") {
+            chil.style.color = colors[Math.floor(Math.random() * colors.length)];
+        }
+    }
+}
 console.log("Done changing font colors to " + colors + ".");`;
     chrome.tabs.executeScript({
         code: script
@@ -122,6 +137,8 @@ function setFontSize(val) {
 console.log("Changing font size to " + val + "...");
 var els = document.getElementsByTagName('p');
 for (var el of els) {
+        cs = getComputedStyle(el); // for debugging font size...
+        console.log("original style: " + cs.font); // for debugging font size...
         el.style.fontSize = val + "px";
         el.style.lineHeight = '100%';
 }
@@ -350,7 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         changeBackgroundColor(settings.bg_r, settings.bg_g, settings.bg_b);
                         var le_color = "rgb(" + settings.le_r + "," + settings.le_g + "," + settings.le_b + ")";
                         var re_color = "rgb(" + settings.re_r + "," + settings.re_g + "," + settings.re_b + ")";
-                        changeFontColor(le_color + "|" + re_color);
+                        changeFontColor(le_color + "|" + re_color, true);
                     }
                     saveUpdatePageSettings(tabs[0].id.toString(), true);
                 }     
@@ -459,7 +476,9 @@ document.addEventListener('DOMContentLoaded', () => {
             changeBackgroundColor(settings.bg_r, settings.bg_g, settings.bg_b);
             var le_color = "rgb(" + settings.le_r + "," + settings.le_g + "," + settings.le_b + ")";
             var re_color = "rgb(" + settings.re_r + "," + settings.re_g + "," + settings.re_b + ")";
-            changeFontColor(le_color + "|" + re_color);
+            getUpdatedPageSettings(tabs[0].id.toString(), (updated_tab_id) => {
+                changeFontColor(le_color + "|" + re_color, !updated_tab_id);
+            });
             settings.colors_on = true;
         });
 
