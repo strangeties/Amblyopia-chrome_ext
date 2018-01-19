@@ -26,11 +26,13 @@ function changeBackgroundColor(r, g, b) {
     changing_bg_color = true;
     color = "rgb(" + r + "," + g + "," + b + ")";
   var script = `color = "` + color + `";
+console.log("Changing background color to " + color + "...");
 document.body.style.backgroundColor=color;
 var els = document.getElementsByTagName("p");
 for (var el of els) {
     el.style.backgroundColor=color;
-}`;
+}
+console.log("Done changing background color to " + color + ".");`;
   // See https://developer.chrome.com/extensions/tabs#method-executeScript.
   // chrome.tabs.executeScript allows us to programmatically inject JavaScript
   // into a page. Since we omit the optional first argument "tabId", the script
@@ -57,6 +59,7 @@ function changeFont(font_size, colors_str, first_run) {
     changing_font = true;
     var script = first_run ? `var colors_str = "` + colors_str + `";
 var font_size_str = "` + font_size + `px";
+console.log("Changing font colors to " + colors_str + "...");
 var colors = colors_str.split('|');
 var els = document.getElementsByTagName('p');
 for (var el of els) {
@@ -76,7 +79,7 @@ for (var el of els) {
         if (content.length > 0) {
             var all_content_text = content.split(' ');
             for (var i_word = 0; i_word < all_content_text.length; i_word++) {
-        	   var word = all_content_text[i_word];
+        	    var word = all_content_text[i_word];
                 span = document.createElement('span');
                 span.innerHTML = word+' ';
                 span.style.color = colors[Math.floor(Math.random() * colors.length)];
@@ -92,10 +95,12 @@ for (var el of els) {
         	el.appendChild(span);
         }
     }
-}` 
+}
+console.log("Done changing font colors to " + colors + ".");` 
     :
     `var colors_str = "` + colors_str + `";
 var font_size_str = "` + font_size + `px";
+console.log("Changing font colors to " + colors_str + "...");
 var colors = colors_str.split('|');
 var els = document.getElementsByTagName('p');
 for (var el of els) {
@@ -108,7 +113,8 @@ for (var el of els) {
             chil.style.lineHeight = font_size_str;
         }
     }
-}`;
+}
+console.log("Done changing font colors to " + colors + ".");`;
     chrome.tabs.executeScript({
         code: script
     }, function() {
@@ -333,14 +339,18 @@ document.addEventListener('DOMContentLoaded', () => {
             selected_font_size.innerHTML = savedSettings.font_size;
 
             getUpdatedPageSettings(tabs[0].id.toString(), (updated_tab_id) => {
+                var script = `console.log("tab ID: ` + tabs[0].id + `, updated: ` + updated_tab_id + `");`;
+                chrome.tabs.executeScript({
+                    code: script
+                });
                 if (!updated_tab_id) {
                     if (savedSettings.colors_on) {
                         changeBackgroundColor(settings.bg_r, settings.bg_g, settings.bg_b);
                         var le_color = "rgb(" + settings.le_r + "," + settings.le_g + "," + settings.le_b + ")";
                         var re_color = "rgb(" + settings.re_r + "," + settings.re_g + "," + settings.re_b + ")";
                         changeFont(settings.font_size, le_color + "|" + re_color, true);
+                        saveUpdatePageSettings(tabs[0].id.toString(), true);
                     }
-                    saveUpdatePageSettings(tabs[0].id.toString(), true);
                 }     
             });
         });
