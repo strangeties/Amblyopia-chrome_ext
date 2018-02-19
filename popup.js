@@ -33,11 +33,6 @@ for (var el of els) {
     el.style.backgroundColor=color;
 }
 console.log("Done changing background color to " + color + ".");`;
-  // See https://developer.chrome.com/extensions/tabs#method-executeScript.
-  // chrome.tabs.executeScript allows us to programmatically inject JavaScript
-  // into a page. Since we omit the optional first argument "tabId", the script
-  // is inserted into the active tab of the current window, which serves as the
-  // default.
   chrome.tabs.executeScript({
     code: script
   }, function() {
@@ -344,7 +339,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     code: script
                 });
                 if (!updated_tab_id) {
-                    if (savedSettings.colors_on) {
                         changeBackgroundColor(settings.bg_r, settings.bg_g, settings.bg_b);
                         var le_color = "rgb(" + settings.le_r + "," + settings.le_g + "," + settings.le_b + ")";
                         var re_color = "rgb(" + settings.re_r + "," + settings.re_g + "," + settings.re_b + ")";

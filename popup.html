@@ -1,33 +1,146 @@
 
 <!doctype html>
 <html>
-  <head>
-    <title>Amblyopia Training Settings</title>
-    <style type="text/css">
-      body {
-        margin: 10px;
-        white-space: nowrap;
-      }
+    <head>
+        <title>Amblyopia Training Settings</title>
+            <style type="text/css">
+                body {
+                    margin: 10px;
+                    white-space: nowrap;
+                }
+                
+                h1 {
+                    font-size: 15px;
+                }
+                
+                #container {
+                    align-items: center;
+                    display: flex;
+                    justify-content: space-between;
+                }
+                
+                /* The button */
+                .button {
+                    background-color: #ccc;
+                    border: none;
+                    border-radius: 34px;
+                    color: black;
+                    padding: 10px 10px;
+                    width: 320px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    font-size: 14px;
+                }
+        
+                /* The switch - the box around the slider */
+                .switch {
+                  position: relative;
+                  display: inline-block;
+                  width: 60px;
+                  height: 34px;
+                }
 
-      h1 {
-        font-size: 15px;
-      }
+                /* Hide default HTML checkbox */
+                .switch input {display:none;}
 
-      #container {
-        align-items: center;
-        display: flex;
-        justify-content: space-between;
-      }
-    </style>
-    <script src="popup.js"></script>
+                /* The slider */
+                .toggle_slider {
+                  position: absolute;
+                  cursor: pointer;
+                  top: 0;
+                  left: 0;
+                  right: 0;
+                  bottom: 0;
+                  background-color: #ccc;
+                  -webkit-transition: .4s;
+                  transition: .4s;
+                }
+
+                .toggle_slider:before {
+                  position: absolute;
+                  content: "";
+                  height: 26px;
+                  width: 26px;
+                  left: 4px;
+                  bottom: 4px;
+                  background-color: white;
+                  -webkit-transition: .4s;
+                  transition: .4s;
+                }
+
+                input:checked + .toggle_slider {
+                  background-color: #2196F3;
+                }
+
+                input:focus + .toggle_slider {
+                  box-shadow: 0 0 1px #2196F3;
+                }
+
+                input:checked + .toggle_slider:before {
+                  -webkit-transform: translateX(26px);
+                  -ms-transform: translateX(26px);
+                  transform: translateX(26px);
+                }
+
+                /* Rounded sliders */
+                .toggle_slider.round {
+                    border-radius: 34px;
+                }
+                
+                .toggle_slider.round:before {
+                    border-radius: 50%;
+                }
+                
+                .tooltip {
+                    position: relative;
+                    display: inline-block;
+                }
+
+                /* Tooltip text */
+                .tooltip .tooltiptext {
+                    visibility: hidden;
+                    background-color: floralwhite;
+                    color: black;
+                    
+                    /* Position the tooltip text - see examples below! */
+                    position: absolute;
+                    top: -5px;
+                    right: 105%;
+                    z-index: 1;
+                    
+                    font-size: 12px;
+                    font-weight: normal;
+                    text-wrap: yes;
+                }
+
+                /* Show the tooltip text when you mouse over the tooltip container */
+                .tooltip:hover .tooltiptext {
+                    visibility: visible;
+                }
+        </style>
+        <script src="popup.js"></script>
   </head>
 
   <body>
-    <h1>Amblyopia Training Settings</h1>
-    <div align="right">
-        <button type="button" id="update_page">Update page</button>
-    </div>
-    <br>
+      <h1>
+          <table width="720">
+              <tr>
+                  <td>Amblyopia Training</td>
+                  <td align="right">
+                      <label class="switch tooltip">
+                          <input type="checkbox" id="toggle_on">
+                          <span class="toggle_slider round"></span>
+                          <span class="tooltiptext">When set to "on", colors and font size are updated for all pages.</span>
+                      </label>
+                  </td>
+              </tr>
+          </table>
+      </h1>
+      
+    <span>
+        When wearing red-blue or cyan-blue 3D glasses, adjust the colors so that test text is only visible to one eye or the other.
+    </span>
     <table width="720">
         <tr height="260">
             <td style="border: 1px solid grey">
@@ -41,6 +154,25 @@
                 <div style="font-size: large; text-align: center; line-height: 150%; color: RGB(0,0,255); background-color: rgb(25,25,25); padding: 4px" id="right_eye_test">TEST</div>
                 &nbsp;
                 <div style="padding: 4px" align="center">visible only to right eye</div>
+            </td>
+        </tr>
+    </table>
+    <table width="720">
+        <tr>
+            <td align="right">
+                <button type="button" id="update_page" class="button">
+                    Update page
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td align="right">
+                <button type="button" id="save_settings" class="button">
+                    Update page and save settings
+                </button>
+            </td>
+            <td align="right">
+                    
             </td>
         </tr>
     </table>
@@ -148,9 +280,5 @@
             </td>
         </tr>
     </table>
-    <hr>
-    <table><tr><td>
-    <button type="button" id="save_settings">Save settings for all URL's with domain, "<div id="domain" style="display: inline-block;">n/a</div>"</button>
-    </td></tr></table>
   </body>
 </html>
