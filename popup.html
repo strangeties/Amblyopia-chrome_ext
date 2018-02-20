@@ -118,6 +118,39 @@
                 .tooltip:hover .tooltiptext {
                     visibility: visible;
                 }
+                
+                /* Radio button */
+                input[type='radio']:after {
+                    width: inherit;
+                    height: inherit;
+                    border-radius: 32px;
+                    top: -2px;
+                    left: -1px;
+                    position: relative;
+                    background-color: #ccc;
+                    content: '';
+                    display: inline-block;
+                    visibility: visible;
+                    border: 2px solid white;
+                    vertical-align: bottom;
+                    margin: 0px;
+                }
+
+                input[type='radio']:checked:after {
+                    width: inherit;
+                    height: inherit;
+                    border-radius: 32px;
+                    top: -2px;
+                    left: -1px;
+                    position: relative;
+                    background-color: #2196F3;
+                    content: '';
+                    display: inline-block;
+                    visibility: visible;
+                    border: 2px solid white;
+                    vertical-align: bottom;
+                    margin: 0px;
+                }
         </style>
         <script src="popup.js"></script>
   </head>
@@ -178,12 +211,30 @@
     </table>
     <hr>
     <table><tr>
-        <td>
+        <td style="vertical-align: bottom">
             Font size:
-            <div style="display: inline" id="selected_font_size">20</div>
         </td>
-        <td>
-            <input type="range" min="8" max="120" step="1" value="20" class="slider" id="font_size_slider">
+        <td style="vertical-align: bottom">
+            <div class="size_button_group">
+                <label style="vertical-align: middle">
+                    <input type="radio" name="size_button" id="extra_small_size_button" style="width: 12px; height: 12px">
+                </label>
+                <label>
+                    <input type="radio" name="size_button" id="small_size_button" style="width: 16px; height: 16px">
+                </label>
+                <label>
+                    <input type="radio" name="size_button" id="medium_size_button" style="width: 20px; height: 20px">
+                </label>
+                <label>
+                    <input type="radio" name="size_button" id="large_size_button" style="width: 24px; height: 24px">
+                </label>
+                <label>
+                    <input type="radio" name="size_button" id="extra_large_size_button" style="width: 28px; height: 28px">
+                </label>
+                <label>
+                    <input type="radio" name="size_button" id="immense_size_button" style="width: 32px; height: 32px">
+                </label>
+            </div>
         </td>
     </tr></table>
     <hr>
