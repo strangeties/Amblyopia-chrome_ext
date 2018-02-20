@@ -119,11 +119,11 @@
                     visibility: visible;
                 }
                 
-                /* Radio button */
-                input[type='radio']:after {
+                /* Radio button for sizes */
+                .size_button[type='radio']:after {
                     width: inherit;
                     height: inherit;
-                    border-radius: 32px;
+                    border-radius: 100%;
                     top: -2px;
                     left: -1px;
                     position: relative;
@@ -136,10 +136,10 @@
                     margin: 0px;
                 }
 
-                input[type='radio']:checked:after {
+                .size_button[type='radio']:checked:after {
                     width: inherit;
                     height: inherit;
-                    border-radius: 32px;
+                    border-radius: 100%;
                     top: -2px;
                     left: -1px;
                     position: relative;
@@ -150,6 +150,39 @@
                     border: 2px solid white;
                     vertical-align: bottom;
                     margin: 0px;
+                }
+                
+                /* Radio button for colors */
+                .color_button[type='radio']:after {
+                    border-radius: 25%;
+                    top: -2px;
+                    left: -1px;
+                    position: relative;
+                    background-color: inherit;
+                    content: '';
+                    display: inline-block;
+                    visibility: visible;
+                    border: 0px solid white;
+                    vertical-align: middle;
+                    margin: 0px;
+                    width: 16px;
+                    height: 16px;
+                }
+                
+                .color_button[type='radio']:checked:after {
+                    border-radius: 25%;
+                    top: -2px;
+                    left: -1px;
+                    position: relative; 
+                    background-color: inherit;
+                    content: '';
+                    display: inline-block;
+                    visibility: visible;
+                    border: 2px solid #2196F3;
+                    vertical-align: middle;
+                    margin: 0px;
+                    width: 12px;
+                    height: 12px;
                 }
         </style>
         <script src="popup.js"></script>
@@ -216,23 +249,23 @@
         </td>
         <td style="vertical-align: bottom">
             <div class="size_button_group">
-                <label style="vertical-align: middle">
-                    <input type="radio" name="size_button" id="extra_small_size_button" style="width: 12px; height: 12px">
+                <label>
+                    <input type="radio" name="size_button" id="extra_small_size_button" class="size_button" style="width: 12px; height: 12px">
                 </label>
                 <label>
-                    <input type="radio" name="size_button" id="small_size_button" style="width: 16px; height: 16px">
+                    <input type="radio" name="size_button" id="small_size_button" class="size_button" style="width: 16px; height: 16px">
                 </label>
                 <label>
-                    <input type="radio" name="size_button" id="medium_size_button" style="width: 20px; height: 20px">
+                    <input type="radio" name="size_button" id="medium_size_button" class="size_button" style="width: 20px; height: 20px">
                 </label>
                 <label>
-                    <input type="radio" name="size_button" id="large_size_button" style="width: 24px; height: 24px">
+                    <input type="radio" name="size_button" id="large_size_button" class="size_button" style="width: 24px; height: 24px">
                 </label>
                 <label>
-                    <input type="radio" name="size_button" id="extra_large_size_button" style="width: 28px; height: 28px">
+                    <input type="radio" name="size_button" id="extra_large_size_button" class="size_button" style="width: 28px; height: 28px">
                 </label>
                 <label>
-                    <input type="radio" name="size_button" id="immense_size_button" style="width: 32px; height: 32px">
+                    <input type="radio" name="size_button" id="immense_size_button" class="size_button" style="width: 32px; height: 32px">
                 </label>
             </div>
         </td>
@@ -243,32 +276,21 @@
             <td colspan="2">
                 Background color:
             </td>
-        </tr>
-        <tr>
-            <td>
-                R:
-                <div style="display: inline" id="selected_bg_r">25</div>
-            </td>
-            <td>
-                <input type="range" min="0" max="255" step="1" value="25" class="slider" id="bg_r_slider">
-            </td>
-        </tr>
-        <tr>
-            <td>
-                G:
-                <div style="display: inline" id="selected_bg_g">25</div>
-            </td>
-            <td>
-                <input type="range" min="0" max="255" step="1" value="25" class="slider" id="bg_g_slider">
-            </td>
-        </tr>
-        <tr>
-            <td>
-                B:
-                <div style="display: inline" id="selected_bg_b">25</div>
-            </td>
-            <td>
-                <input type="range" min="0" max="255" step="1" value="25" class="slider" id="bg_b_slider">
+            <td style="vertical-align: middle">
+                <div class="bg_color_group">
+                    <label>
+                        <input type="radio" name="bg_color_button" id="black_bg_color_button" class="color_button" style="background-color: rgb(25,25,25)">
+                    </label>
+                    <label>
+                        <input type="radio" name="bg_color_button" id="dark_grey_bg_color_button" class="color_button" style="background-color: rgb(90,90,90)">
+                    </label>
+                    <label>
+                        <input type="radio" name="bg_color_button" id="grey_bg_color_button" class="color_button" style="background-color: rgb(120,120,120)">
+                    </label>
+                    <label>
+                        <input type="radio" name="bg_color_button" id="light_grey_bg_color_button" class="color_button" style="background-color: rgb(180,180,180)">
+                    </label>
+                </div>
             </td>
         </tr>
     </table>

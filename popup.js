@@ -8,7 +8,14 @@ var kFontSizeMap = {
     large: '42px',
     extra_large: '64px',
     immense: '96px'
-}
+};
+
+var kBgColorMap = {
+    black: 'rgb(25,25,25)',
+    dark_grey: 'rgb(90,90,90)',
+    grey: 'rgb(120,120,120)',
+    light_grey: 'rgb(180,180,180)'
+};
 
 var changing_bg_color = false;
 var changing_font = false;
@@ -25,15 +32,15 @@ function EnableUpdatePage() {
     update_page_button.style.color = 'rgb(0,0,0)';
 }
 
-/**
+/*
  * Change the background color of the current page.
  *
  * @param {string} color The new background color.
  */
-function changeBackgroundColor(r, g, b) {
+function changeBackgroundColor(color) {
     DisableUpdatePage();
     changing_bg_color = true;
-    color = "rgb(" + r + "," + g + "," + b + ")";
+    color = kBgColorMap[color];
   var script = `color = "` + color + `";
 console.log("Changing background color to " + color + "...");
 document.body.style.backgroundColor=color;
@@ -52,10 +59,9 @@ console.log("Done changing background color to " + color + ".");`;
   });
 }
 
-function setBgColorInExt(r, g, b) {
-    color = "rgb(" + r + "," + g + "," + b + ")";
-    document.getElementById("left_eye_test").style.backgroundColor = color;
-    document.getElementById("right_eye_test").style.backgroundColor = color;
+function setBgColorInExt(color) {
+    document.getElementById("left_eye_test").style.backgroundColor = kBgColorMap[color];
+    document.getElementById("right_eye_test").style.backgroundColor = kBgColorMap[color];
 }
 
 function changeFont(font_size, colors_str, first_run) {
@@ -152,9 +158,7 @@ function setFontSizeInExt(size) {
 
 function settingsToString(settings) {
     return settings.font_size + "|" + 
-        settings.bg_r + "|" + 
-        settings.bg_g + "|" + 
-        settings.bg_b + "|" + 
+        settings.bg_color + "|" +
         settings.le_r + "|" +
         settings.le_g + "|" +
         settings.le_b + "|" +
@@ -167,15 +171,13 @@ function stringToSettings(str) {
     var settings = {};
     var arr = str.split('|');
     settings.font_size = arr[0];
-    settings.bg_r = parseInt(arr[1]);
-    settings.bg_g = parseInt(arr[2]);
-    settings.bg_b = parseInt(arr[3]);
-    settings.le_r = parseInt(arr[4]);
-    settings.le_g = parseInt(arr[5]);
-    settings.le_b = parseInt(arr[6]);
-    settings.re_r = parseInt(arr[7]);
-    settings.re_g = parseInt(arr[8]);
-    settings.re_b = parseInt(arr[9]);
+    settings.bg_color = arr[1];
+    settings.le_r = parseInt(arr[2]);
+    settings.le_g = parseInt(arr[3]);
+    settings.le_b = parseInt(arr[4]);
+    settings.re_r = parseInt(arr[5]);
+    settings.re_g = parseInt(arr[6]);
+    settings.re_b = parseInt(arr[7]);
     return settings;
 }
 
@@ -184,9 +186,7 @@ function getSavedOrDefaultSettings(callback) {
     chrome.storage.sync.get((items) => {
         var default_settings = {
             font_size: 'medium',
-            bg_r: 25,
-            bg_g: 25,
-            bg_b: 25,
+            bg_color: 'black',
             le_r: 255,
             le_g: 0,
             le_b: 0,
@@ -255,16 +255,14 @@ chrome.tabs.onUpdated.addListener(
 document.addEventListener('DOMContentLoaded', () => {
 
     var settings = {
-      font_size: 'medium',
-      bg_r: 25,
-      bg_g: 25,
-      bg_b: 25,
-      le_r: 255,
-      le_g: 0,
-      le_b: 0,
-      re_r: 0,
-      re_g: 0,
-      re_b: 255
+        font_size: 'medium',
+        bg_color: 'black',
+        le_r: 255,
+        le_g: 0,
+        le_b: 0,
+        re_r: 0,
+        re_g: 0,
+        re_b: 255
     };
     
     chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
@@ -278,12 +276,10 @@ document.addEventListener('DOMContentLoaded', () => {
         var extra_large_size_button = document.getElementById("extra_large_size_button");
         var immense_size_button = document.getElementById("immense_size_button");
       
-        var bg_r_slider = document.getElementById("bg_r_slider");  
-        var bg_g_slider = document.getElementById("bg_g_slider");  
-        var bg_b_slider = document.getElementById("bg_b_slider"); 
-        var selected_bg_r = document.getElementById("selected_bg_r");  
-        var selected_bg_g = document.getElementById("selected_bg_g");  
-        var selected_bg_b = document.getElementById("selected_bg_b"); 
+        var black_bg_color_button = document.getElementById("black_bg_color_button");
+        var dark_grey_bg_color_button = document.getElementById("dark_grey_bg_color_button");
+        var grey_bg_color_button = document.getElementById("grey_bg_color_button");
+        var light_grey_bg_color_button = document.getElementById("light_grey_bg_color_button");
 
         var le_r_slider = document.getElementById("le_r_slider");  
         var le_g_slider = document.getElementById("le_g_slider");  
@@ -306,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
            toggle_on = savedToggleOn;
             
             var script = `console.log("getting toggle on setting: ` + savedToggleOn + `");`;
-                chrome.tabs.executeScript({
+            chrome.tabs.executeScript({
                 code: script
             });
             toggle_on_slider.checked = toggle_on;
@@ -316,14 +312,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!isNaN(savedSettings.font_size)) {
                     settings.font_size = savedSettings.font_size;
                 }
-                if (!isNaN(savedSettings.bg_r)) {
-                    settings.bg_r = savedSettings.bg_r;
-                }
-                if (!isNaN(savedSettings.bg_g)) {
-                    settings.bg_g = savedSettings.bg_g;
-                }
-                if (!isNaN(savedSettings.bg_b)) {
-                    settings.bg_b = savedSettings.bg_b;
+                if (!isNaN(savedSettings.bg_color)) {
+                    settings.bg_color = savedSettings.bg_color;
                 }
                 if (!isNaN(savedSettings.le_r)) {
                     settings.le_r = savedSettings.le_r;
@@ -344,15 +334,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     settings.re_b = savedSettings.re_b;
                 }
                 setFontSizeInExt(settings.font_size);
-                setBgColorInExt(settings.bg_r, settings.bg_g, settings.bg_b);
+                setBgColorInExt(settings.bg_color);
+                
                 setLeColorInExt(settings.le_r, settings.le_g, settings.le_b);
                 setReColorInExt(settings.re_r, settings.re_g, settings.re_b);
-                bg_r_slider.value = settings.bg_r;
-                selected_bg_r.innerHTML = settings.bg_r;
-                bg_g_slider.value = settings.bg_g;
-                selected_bg_g.innerHTML = settings.bg_g;
-                bg_b_slider.value = settings.bg_b;
-                selected_bg_b.innerHTML = settings.bg_b;
 
                 le_r_slider.value = settings.le_r;
                 selected_le_r.innerHTML = settings.le_r;
@@ -367,18 +352,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 re_b_slider.value = settings.re_b;
                 selected_re_b.innerHTML = settings.re_b;
 
-                if (savedSettings.font_size == 'extra_small') {
+                if (settings.font_size == 'extra_small') {
                     extra_small_size_button.checked = true;
-                } else if (savedSettings.font_size == 'small') {
+                } else if (settings.font_size == 'small') {
                     small_size_button.checked = true;
-                } else if (savedSettings.font_size == 'medium') {
+                } else if (settings.font_size == 'medium') {
                     medium_size_button.checked = true;
-                } else if (savedSettings.font_size == 'large') {
+                } else if (settings.font_size == 'large') {
                     large_size_button.checked = true;
-                } else if (savedSettings.font_size == 'extra_large') {
+                } else if (settings.font_size == 'extra_large') {
                     extra_large_size_button.checked = true;
-                } else if (savedSettings.font_size == 'immense') {
+                } else if (settings.font_size == 'immense') {
                     immense_size_button.checked = true;
+                }
+                
+                if (settings.bg_color == 'black') {
+                    black_bg_color_button.checked = 'true';
+                } else if (settings.bg_color == 'dark_grey') {
+                    dark_grey_bg_color_button.checked = 'true';
+                } else if (settings.bg_color == 'grey') {
+                    grey_bg_color_button.checked = 'true';
+                } else if (settings.bg_color == 'light_grey') {
+                    light_grey_bg_color_button.checked = 'true';
                 }
 
                 getUpdatedPageSettings(tabs[0].id.toString(), (updated_tab_id) => {
@@ -388,7 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     if (!updated_tab_id) {
                         if (toggle_on_slider.checked) {
-                            changeBackgroundColor(settings.bg_r, settings.bg_g, settings.bg_b);
+                            changeBackgroundColor(settings.bg_color);
                             var le_color = "rgb(" + settings.le_r + "," + settings.le_g + "," + settings.le_b + ")";
                             var re_color = "rgb(" + settings.re_r + "," + settings.re_g + "," + settings.re_b + ")";
                             changeFont(settings.font_size, le_color + "|" + re_color, true);
@@ -427,34 +422,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 settings.font_size = 'immense'
                 setFontSizeInExt(settings.font_size);
             });
-
-            bg_r_slider.addEventListener('change', () => {
-                settings.bg_r = bg_r_slider.value;
-                setBgColorInExt(bg_r_slider.value, bg_g_slider.value, bg_b_slider.value);
+            
+            black_bg_color_button.addEventListener('click', () => {
+                settings.bg_color = 'black';
+                setBgColorInExt(settings.bg_color);
             });
-
-            bg_r_slider.addEventListener('input', () => {
-                selected_bg_r.innerHTML = bg_r_slider.value;
+            
+            dark_grey_bg_color_button.addEventListener('click', () => {
+                settings.bg_color = 'dark_grey';
+                setBgColorInExt(settings.bg_color);
             });
-
-            bg_g_slider.addEventListener('change', () => {
-                settings.bg_g = bg_g_slider.value;
-                selected_bg_g.innerHTML = settings.bg_g;
-                setBgColorInExt(bg_r_slider.value, bg_g_slider.value, bg_b_slider.value);
+            
+            grey_bg_color_button.addEventListener('click', () => {
+                settings.bg_color = 'grey';
+                setBgColorInExt(settings.bg_color);
             });
-
-            bg_g_slider.addEventListener('input', () => {
-                selected_bg_g.innerHTML = bg_g_slider.value;
-            });
-
-            bg_b_slider.addEventListener('change', () => {
-                settings.bg_b = bg_b_slider.value;
-                selected_bg_b.innerHTML = settings.bg_b;
-                setBgColorInExt(bg_r_slider.value, bg_g_slider.value, bg_b_slider.value);
-            });
-
-            bg_b_slider.addEventListener('input', () => {
-                selected_bg_b.innerHTML = bg_b_slider.value;
+            
+            light_grey_bg_color_button.addEventListener('click', () => {
+                settings.bg_color = 'light_grey';
+                setBgColorInExt(settings.bg_color);
             });
 
             le_r_slider.addEventListener('change', () => {
@@ -521,7 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             var update_page = document.getElementById('update_page');
             update_page.addEventListener('click', () => {
-                changeBackgroundColor(settings.bg_r, settings.bg_g, settings.bg_b);
+                changeBackgroundColor(settings.bg_color);
                 var le_color = "rgb(" + settings.le_r + "," + settings.le_g + "," + settings.le_b + ")";
                 var re_color = "rgb(" + settings.re_r + "," + settings.re_g + "," + settings.re_b + ")";
                 getUpdatedPageSettings(tabs[0].id.toString(), (updated_tab_id) => {
@@ -531,7 +517,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             var save_settings = document.getElementById('save_settings');
             save_settings.addEventListener('click', () => {
-                changeBackgroundColor(settings.bg_r, settings.bg_g, settings.bg_b);
+                changeBackgroundColor(settings.bg_color);
                 var le_color = "rgb(" + settings.le_r + "," + settings.le_g + "," + settings.le_b + ")";
                 var re_color = "rgb(" + settings.re_r + "," + settings.re_g + "," + settings.re_b + ")";
                 getUpdatedPageSettings(tabs[0].id.toString(), (updated_tab_id) => {
