@@ -1,12 +1,18 @@
 {
   "manifest_version": 2,
 
-  "name": "Amblyopia-Training Font Style Adjuster",
-  "description": "This extension allows the user to change the background color of the current page, text color, and text size to facilitate amblyopia training.",
-  "version": "1.0",
+  "name": "Amblyopia Training: Web Reader",
+  "description": "For antisupression vision therapy: increases font size and changes color of individual words to red or blue.  Requires 3D red-blue glasses",
+  "version": "0.0.1",
+
+  "icons": {
+      "16": "icon_16x16.png",
+      "48": "icon_48x48.png",
+      "128": "icon_128x128.png"
+  },
 
   "browser_action": {
-    "default_icon": "icon.png",
+    "default_icon": "icon_16x16.png",
     "default_popup": "popup.html"
   },
   "background": {
