@@ -20,31 +20,31 @@ var kBgColorMap = {
 var kFontColorMap = {
     red: 'rgb(255,0,0)',
     dimmer_red: 'rgb(180,0,0)',
-    blue: 'rgb(25,25,255)',
-    dimmer_blue: 'rgb(25,25,180)'
-}
+    blue: 'rgb(0,0,255)',
+    dimmer_blue: 'rgb(0,0,180)'
+};
 
 var changing_bg_color = false;
 var changing_font = false;
 
 function DisableUpdatePage() {
     var update_page_button = document.getElementById('update_page');
+    var save_settings_button = document.getElementById('save_settings');
     update_page_button.disabled = true;
-    save_settings.disabled = true;
-    update_page_button.style.color = 'white';
-    save_settings.style.color = 'white';
-    update_page_button.style.backgroundColor = '#2196F3';
-    save_settings.style.backgroundColor = '#2196F3';
+    update_page_button.style.cursor = 'default';
+    save_settings_button.disabled = true;
+    save_settings_button.style.cursor = 'default';  
+    document.body.style.cursor==='wait';
 }
 
 function EnableUpdatePage() {
     var update_page_button = document.getElementById('update_page');
+    var save_settings_button = document.getElementById('save_settings');
     update_page_button.disabled = false;
-    save_settings.disabled = false;
-    update_page_button.style.color = 'black';
-    save_settings.style.color = 'black';
-    update_page_button.style.backgroundColor = '#ccc';
-    save_settings.style.backgroundColor = '#ccc';
+    update_page_button.style.cursor = 'pointer';
+    save_settings_button.disabled = false;
+    save_settings_button.style.cursor = 'pointer';
+    document.body.style.cursor==='auto';
 }
 
 /*
@@ -83,8 +83,9 @@ function changeFont(font_size, colors_str, first_run) {
     DisableUpdatePage();
     changing_font = true;
     var script = first_run ? `var colors_str = "` + colors_str + `";
-var font_size_str = "` + kFontSizeMap[font_size] + `";
+var font_size_str = "` + font_size + `";
 console.log("Changing font colors to " + colors_str + "...");
+console.log("Changing font size to " + font_size_str + "...");
 var colors = colors_str.split('|');
 var els = document.getElementsByTagName('p');
 for (var el of els) {
@@ -106,11 +107,12 @@ for (var el of els) {
             for (var i_word = 0; i_word < all_content_text.length; i_word++) {
         	    var word = all_content_text[i_word];
                 span = document.createElement('span');
-                span.innerHTML = word+' ';
+                span.innerHTML = word+'&nbsp;';
                 span.style.color = colors[Math.floor(Math.random() * colors.length)];
                 span.style.textShadow = 'none';
                 span.style.fontSize = font_size_str;
                 span.style.lineHeight = font_size_str;
+                span.style.display = 'inline-block';
                 el.appendChild(span);
             }
         }
@@ -124,8 +126,9 @@ for (var el of els) {
 console.log("Done changing font colors to " + colors + ".");` 
     :
     `var colors_str = "` + colors_str + `";
-var font_size_str = "` + font_size + `px";
+var font_size_str = "` + font_size + `";
 console.log("Changing font colors to " + colors_str + "...");
+console.log("Changing font size to " + font_size_str + "...");
 var colors = colors_str.split('|');
 var els = document.getElementsByTagName('p');
 for (var el of els) {
@@ -136,6 +139,7 @@ for (var el of els) {
             chil.style.color = colors[Math.floor(Math.random() * colors.length)];
             chil.style.fontSize = font_size_str;
             chil.style.lineHeight = font_size_str;
+            chil.style.display = 'inline-block';
         }
     }
 }
@@ -178,6 +182,10 @@ function settingsToString(settings) {
 
 function stringToSettings(str) {
     var settings = {};
+    var script = `console.log("parsing settings string, ` + str + `");`;
+    chrome.tabs.executeScript({
+        code: script
+    });
     var arr = str.split('|');
     settings.font_size = arr[0];
     settings.bg_color = arr[1];
@@ -298,22 +306,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Load the saved settings for this host.
             getSavedOrDefaultSettings((savedSettings) => {
-                if (!isNaN(savedSettings.font_size)) {
+                var script = `console.log("parsed saved settings: ` + savedSettings.font_size + `|` + savedSettings.bg_color + `|` + savedSettings.left_color + `|` + savedSettings.right_color + `");`;
+                chrome.tabs.executeScript({
+                    code: script
+                });
+                
+                if (savedSettings.font_size) {
+                    var script = `console.log("savedSettings.font_size is not null!");`;
+                    chrome.tabs.executeScript({
+                        code: script
+                    });
                     settings.font_size = savedSettings.font_size;
+                } else {
+                    var script = `console.log("savedSettings.font_size is null: ` + savedSettings.font_size + `");`;
+                    chrome.tabs.executeScript({
+                        code: script
+                    });
                 }
-                if (!isNaN(savedSettings.bg_color)) {
+                if (savedSettings.bg_color) {
                     settings.bg_color = savedSettings.bg_color;
                 }
-                if (!isNaN(savedSettings.left_color)) {
+                if (savedSettings.left_color) {
                     settings.left_color = savedSettings.left_color;
                 }
-                if (!isNaN(savedSettings.right_color)) {
+                if (savedSettings.right_color) {
                     settings.right_color = savedSettings.right_color;
                 }
                 
+                var script = `console.log("parsed settings: ` + settings.font_size + `|` + settings.bg_color + `|` + settings.left_color + `|` + settings.right_color + `");`;
+                chrome.tabs.executeScript({
+                    code: script
+                });
+                
                 setFontSizeInExt(settings.font_size);
                 setBgColorInExt(settings.bg_color);
-                
                 setLeColorInExt(settings.left_color);
                 setReColorInExt(settings.right_color);
 
@@ -361,7 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (!updated_tab_id) {
                         if (toggle_on_slider.checked) {
                             changeBackgroundColor(settings.bg_color);
-                            changeFont(settings.font_size, kFontColorMap[settings.left_color] + "|" + kFontColorMap[settings.right_color], true);
+                            changeFont(kFontSizeMap[settings.font_size], kFontColorMap[settings.left_color] + "|" + kFontColorMap[settings.right_color], true);
                             saveUpdatePageSettings(tabs[0].id.toString(), true);
                         }
                     }     
@@ -446,7 +472,12 @@ document.addEventListener('DOMContentLoaded', () => {
             update_page.addEventListener('click', () => {
                 changeBackgroundColor(settings.bg_color);
                 getUpdatedPageSettings(tabs[0].id.toString(), (updated_tab_id) => {
-                    changeFont(settings.font_size, kFontColorMap[settings.left_color] + "|" + kFontColorMap[settings.right_color], !updated_tab_id);
+                    var script = `console.log("tab ID: ` + tabs[0].id + `, updated: ` + updated_tab_id + `");`;
+                    chrome.tabs.executeScript({
+                        code: script
+                    });
+                    changeFont(kFontSizeMap[settings.font_size], kFontColorMap[settings.left_color] + "|" + kFontColorMap[settings.right_color], !updated_tab_id);
+                    saveUpdatePageSettings(tabs[0].id.toString(), true);
                 });
             });
 
@@ -454,7 +485,12 @@ document.addEventListener('DOMContentLoaded', () => {
             save_settings.addEventListener('click', () => {
                 changeBackgroundColor(settings.bg_color);
                 getUpdatedPageSettings(tabs[0].id.toString(), (updated_tab_id) => {
-                    changeFont(settings.font_size, kFontColorMap[settings.left_color] + "|" + kFontColorMap[settings.right_color], !updated_tab_id);
+                    var script = `console.log("tab ID: ` + tabs[0].id + `, updated: ` + updated_tab_id + `");`;
+                    chrome.tabs.executeScript({
+                        code: script
+                    });
+                    changeFont(kFontSizeMap[settings.font_size], kFontColorMap[settings.left_color] + "|" + kFontColorMap[settings.right_color], !updated_tab_id);
+                    saveUpdatePageSettings(tabs[0].id.toString(), true);
                 });
                 saveSettings(settings); 
             }); 
